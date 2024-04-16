@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+  localstack:
+    image: localstack/localstack:latest
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - SERVICES=dynamodb,sqs
+      - EDGE_PORT=4566
+      - DEBUG=1
+      - AWS_DEFAULT_OUTPUT=json
+      - AWS_DEFAULT_REGION=us-east-1
+    ports:
+      - "4566:4566"
+    volumes:
+      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - ./localstack-setup.sh:/etc/localstack/init/ready.d/script.sh
+    networks:
+      - localstack_network
+
+  auth:
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_REGION=us-east-1
+      - DYNAMO_ENDPOINT=http://localstack:4566
+      - SQS_BANK_QUEUE_URL=http://localstack:4566/000000000000/sqs-bank-account
+    build:
+      context: ./apps/auth
+    ports:
+      - 3003:3003
+    depends_on:
+      - localstack
+    networks:
+      - localstack_network
+
+networks:
+  localstack_network:
+    driver: bridge
