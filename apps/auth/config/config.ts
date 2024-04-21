@@ -1,3 +1,5 @@
+import { join } from 'path';
+
 export default () => ({
   port: process.env.PORT || 3003,
   dynamo: {
@@ -11,6 +13,17 @@ export default () => ({
     bankQueueUrl:
       process.env.SQS_BANK_QUEUE_URL ||
       'http://localhost:4566/000000000000/sqs-bank-account',
+  },
+  transfer: {
+    name: 'TRANSACTIONS_PACKAGE',
+    options: {
+      url: process.env.TRANSFER_URL || 'localhost:5000',
+      package: 'transactions',
+      protoPath: join(
+        __dirname,
+        '../gateway/infrastructure/outbound/transactions/transactions.proto',
+      ),
+    },
   },
   security: {
     secret: process.env.SECURITY_PRIVATE_KEY || 'private_key',

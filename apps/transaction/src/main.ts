@@ -1,13 +1,24 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
 import config from 'config/config';
+import { join } from 'path';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe());
+  const confVars = config();
+  const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+    AppModule,
+    {
+      transport: Transport.GRPC,
+      options: {
+        url: confVars.grpc.port,
+        package: confVars.grpc.package,
+        protoPath: join(__dirname, confVars.grpc.path),
+      },
+    },
+  );
 
-  await app.listen(config().port);
+  await app.listen();
 }
 
 bootstrap();

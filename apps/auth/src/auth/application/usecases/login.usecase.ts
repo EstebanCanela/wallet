@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import UserAdapter from 'src/auth/infrastructure/outbound/adapters/users.adapter';
 import { comparePassword } from 'src/utils/bcrypt';
 import { createAccess } from '../ports/access/access.mapper';
@@ -23,7 +23,7 @@ export default class LoginUseCase {
 
     try {
       if (!user) {
-        throw new Error('User does not exist');
+        throw new HttpException('User does not exist', HttpStatus.UNAUTHORIZED);
       }
 
       const passwordMatched = await comparePassword(
@@ -32,7 +32,10 @@ export default class LoginUseCase {
       );
 
       if (!passwordMatched) {
-        throw new Error('Password does not match');
+        throw new HttpException(
+          'Password does not match',
+          HttpStatus.UNAUTHORIZED,
+        );
       }
 
       const jwtPayload = {

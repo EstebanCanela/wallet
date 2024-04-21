@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import config from 'config/config';
 import { ConfigModule } from '@nestjs/config';
-// import { CommonModule } from './common/common.module';
+import { SqsModule } from '@ssut/nestjs-sqs';
 import { TransactionsModule } from './transactions/transactions.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Balance } from './transactions/infrastructure/outbound/adapters/balance/entity';
 import { DataSource } from 'typeorm';
+import { Deposit } from './transactions/infrastructure/outbound/adapters/deposit/entity';
+import { Transfer } from './transactions/infrastructure/outbound/adapters/transfer/entity';
 
 @Module({
   imports: [
@@ -16,10 +18,23 @@ import { DataSource } from 'typeorm';
     TypeOrmModule.forRoot({
       ...config().sql,
       type: 'mysql',
-      entities: [Balance],
+      entities: [Balance, Deposit],
+    }),
+    TypeOrmModule.forRoot({
+      ...config().mongo,
+      type: 'mongodb',
+      name: 'transferConnection',
+      entities: [Transfer],
+    }),
+    SqsModule.register({
+      consumers: [
+        {
+          ...config().sqs,
+        },
+      ],
+      producers: [],
     }),
     TransactionsModule,
-    // CommonModule,
   ],
   controllers: [],
   providers: [],

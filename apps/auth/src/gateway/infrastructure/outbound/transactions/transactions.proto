@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package transactions;
+
+service TransactionService {
+  rpc Deposit (DepositInput) returns (DepositOutput) {}
+  rpc Transfer (TransferInput) returns (TransferOutput) {}
+  rpc Balances (BalanceInput) returns (BalanceOutput) {}
+}
+
+message DepositInput {
+  string cbu = 1;
+  float amount = 2;
+  string userId = 3;
+  string terminal = 4;
+}
+
+message DepositOutput {
+  string status = 1;
+  string type = 2;
+}
+
+
+message TransferInput {
+  string cbu = 1;
+  float amount = 2;
+  string description = 3;
+  string userId = 4;
+}
+
+message TransferOutput {
+  string status = 1;
+  string type = 2;
+}
+
+message BalanceInput {
+  string userId = 1;
+}
+
+message Balance {
+  string cbu = 1;
+  string currency = 2;
+}
+
+message BalanceOutput {
+  repeated Balance balances = 1;
+}

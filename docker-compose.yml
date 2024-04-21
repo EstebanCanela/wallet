@@ -19,6 +19,28 @@ services:
     networks:
       - localstack_network
 
+  mysql-deposit:
+    image: mysql:8.3
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=deposit
+    ports:
+      - "3306:3306"
+    networks:
+      - localstack_network
+
+  mongodb-transfer:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_DATABASE: transfer
+    ports:
+      - 27017:27017
+    volumes:
+      - transfer-mongodb:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js
+
   auth:
     environment:
       - AWS_ACCESS_KEY_ID=local
@@ -26,6 +48,7 @@ services:
       - AWS_REGION=us-east-1
       - DYNAMO_ENDPOINT=http://localstack:4566
       - SQS_BANK_QUEUE_URL=http://localstack:4566/000000000000/sqs-bank-account
+      - TRANSFER_URL=transactions:5000
     build:
       context: ./apps/auth
     ports:
@@ -35,6 +58,27 @@ services:
     networks:
       - localstack_network
 
+  transactions:
+    environment:
+      - AWS_ACCESS_KEY_ID=local
+      - AWS_SECRET_ACCESS_KEY=local
+      - AWS_REGION=us-east-1
+      - PORT=0.0.0.0:5000
+      - SQL_HOST=mysql-deposit
+      - MONGO_DB_HOST=host.docker.internal
+      - SQS_BANK_QUEUE_URL=http://localstack:4566/000000000000/sqs-bank-account
+    build:
+      context: ./apps/transaction
+    ports:
+      - 5001:5000
+    depends_on:
+      - localstack
+    networks:
+      - localstack_network
+
 networks:
   localstack_network:
     driver: bridge
+
+volumes:
+  transfer-mongodb:

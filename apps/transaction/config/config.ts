@@ -1,25 +1,34 @@
 export default () => ({
-  port: process.env.PORT || 3003,
+  grpc: {
+    port: process.env.PORT || 'localhost:5000',
+    package: 'transactions',
+    path: '../transactions/infrastructure/inbound/grpc/proto/transactions.proto',
+  },
   sql: {
-    host: 'localhost',
-    port: 3306,
-    username: 'root',
-    password: 'root',
-    database: 'deposit',
-    // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+    host: process.env.SQL_HOST || 'localhost',
+    port: process.env.SQL_PORT ? Number(process.env.SQL_PORT) : 3306,
+    username: process.env.SQL_USER || 'root',
+    password: process.env.SQL_PASSWORD || 'root',
+    database: process.env.SQL_DATABASE || 'deposit',
+    synchronize: true,
+  },
+  mongo: {
+    type: 'mongodb',
+    host: process.env.MONGO_DB_HOST || 'mongodb-transfer',
+    port: process.env.MONGO_DB_PORT ? Number(process.env.MONGO_DB_PORT) : 27017,
+    username: process.env.MONGO_DB_USER || 'root',
+    password: process.env.MONGO_DB_PASSWORD || 'root',
+    database: process.env.MONGO_DB_DATABASE || 'transfer',
     synchronize: true,
   },
   sqs: {
     region: process.env.SQS_REGION || 'us-east-1',
-    apiVersion: '2012-11-05',
-    bankQueueUrl:
+    name: process.env.SQS_NAME || 'sqs-bank-account',
+    queueUrl:
       process.env.SQS_BANK_QUEUE_URL ||
       'http://localhost:4566/000000000000/sqs-bank-account',
   },
-  security: {
-    secret: process.env.SECURITY_PRIVATE_KEY || 'private_key',
-    signOptions: {
-      expiresIn: process.env.SECURITY_EXPIRES_IN || '600s',
-    },
+  terminal: {
+    id: '127.127.1.1',
   },
 });

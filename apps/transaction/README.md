@@ -1,18 +1,19 @@
-# Auth
+# Transaction
 
-This service provides authentication functionality for managing user authentication in your application.
+The Transaction Service allows for the generation of deposit or transfer operations. Transfers are stored in MongoDB and deposits are stored in MySQL.
 
 ## Features
 
-- User registration
-- User login
-- Token-based authentication
-- Password hashing for security
+- Transfers
+- Deposits
+- Retrieve Balances
 
 ## Requirements
 
 - Node.js
-- PNPM
+- MongoDB
+- MySQL
+- SQS
 
 ## How to run it
 
@@ -32,12 +33,19 @@ Create a .env file in the root of the project and add the following environment 
 
 ```
 PORT=""
-DYNAMO_REGION=""
-DYNAMO_ENDPOINT=""
+SQL_HOST=""
+SQL_PORT=""
+SQL_USER=""
+SQL_PASSWORD=""
+SQL_DATABASE=""
+MONGO_DB_HOST=""
+MONGO_DB_PORT=""
+MONGO_DB_USER=""
+MONGO_DB_PASSWORD=""
+MONGO_DB_DATABASE=""
 SQS_REGION=""
+SQS_NAME=""
 SQS_BANK_QUEUE_URL=""
-SECURITY_PRIVATE_KEY=""
-SECURITY_EXPIRES_IN=""
 ```
 
 ### Step 3
